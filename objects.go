@@ -430,3 +430,70 @@ type CrosstableMatchup struct {
 	Users   map[string]float64 `json:"users"`
 	NbGames int                `json:"nbGames"`
 }
+
+type Event struct {
+	Type      string    `json:"type"`
+	Game      Game      `json:"game"`
+	Challenge Challenge `json:"challenge"`
+}
+
+type Challenge struct {
+	Id          string      `json:"id"`
+	Status      string      `json:"status"`
+	Compat      Compat      `json:"compat"`
+	Challenger  Challenger  `json:"challenger"`
+	DestUser    DestUser    `json:"destUser"`
+	Variant     Variant     `json:"variant"`
+	Rated       bool        `json:"rated"`
+	TimeControl TimeControl `json:"time_control"`
+	Color       string      `json:"color"`
+	Perf        Perf        `json:"perf"`
+}
+
+type Perf struct {
+	Icon string `json:"icon"`
+	Name string `json:"name"`
+}
+
+type Game struct {
+	Id     string `json:"id"`
+	Compat Compat `json:"compat"`
+}
+
+type Compat struct {
+	Bot   bool `json:"bot"`
+	Board bool `json:"board"`
+}
+
+type Variant struct {
+	Key   string `json:"key"`
+	Name  string `json:"name"`
+	Short string `json:"short"`
+}
+
+type Challenger struct {
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	Title  string `json:"title"`
+	Rating int    `json:"rating"`
+	Patron bool   `json:"patron"`
+	Online bool   `json:"online"`
+	Lag    int    `json:"lag"`
+}
+
+type DestUser struct {
+	Id          string `json:"id"`
+	Name        string `json:"name"`
+	Title       string `json:"title"`
+	Rating      int    `json:"rating"`
+	Provisional bool   `json:"provisional"`
+	Online      bool   `json:"online"`
+	Lag         int    `json:"lag"`
+}
+
+type TimeControl struct {
+	Type      string `json:"type"`
+	Limit     int    `json:"limit"`
+	Increment int    `json:"increment"`
+	Show      string `json:"show"`
+}

@@ -31,12 +31,26 @@ func (a *Api) delete(endpoint string, query url.Values, result interface{}) erro
 	return a.call(http.MethodDelete, endpoint, query, nil, result)
 }
 
-func (a *Api) getResponse(endpoint string, query url.Values) (*http.Response, error) {
-	return a.callResponse(http.MethodGet, endpoint, query, nil)
+func (a *Api) getEvent(endpoint string, query url.Values, result interface{}, sei streamEventInterface) error {
+	res, err := a.callResponse(http.MethodGet, endpoint, query, nil)
+	if err != nil {
+		return err
+	}
+
+	go writeEventData(sei, res, result)
+
+	return nil
 }
 
-func (a *Api) postResponse(endpoint string, query url.Values, body io.Reader) (*http.Response, error) {
-	return a.callResponse(http.MethodPost, endpoint, query, body)
+func (a *Api) postEvent(endpoint string, query url.Values, body io.Reader, result interface{}, sei streamEventInterface) error {
+	res, err := a.callResponse(http.MethodPost, endpoint, query, body)
+	if err != nil {
+		return err
+	}
+
+	go writeEventData(sei, res, result)
+
+	return nil
 }
 
 //formRequest generate a request
@@ -100,4 +114,21 @@ func (a *Api) call(method, endpoint string, query url.Values, body io.Reader, re
 		}
 	}
 	return nil
+}
+
+func writeEventData(sei streamEventInterface, response *http.Response, result interface{}) {
+	defer response.Body.Close()
+
+	for {
+		if sei.isClosed() {
+			break
+		} else if err := json.NewDecoder(response.Body).Decode(result); err == nil {
+			sei.write(result)
+		} else {
+			sei.Close()
+			break
+		}
+	}
+
+	return
 }
