@@ -9,7 +9,11 @@ import (
 	"net/url"
 )
 
-const HOST = "lichess.org"
+const (
+	HOST              = "lichess.org"
+	CONTENT_TYPE_JSON = "application/json"
+	CONTENT_TYPE_PGN  = "application/x-chess-pgn"
+)
 
 type Api struct {
 	token string
@@ -19,59 +23,68 @@ func NewApi(token string) *Api {
 	return &Api{token}
 }
 
-func (a *Api) get(endpoint string, query url.Values, result interface{}) error {
-	return a.call(http.MethodGet, endpoint, query, nil, result)
+func (a *Api) get(endpoint, contentType string, query url.Values, result interface{}) error {
+	return a.call(http.MethodGet, endpoint, contentType, query, nil, result)
 }
 
-func (a *Api) post(endpoint string, query url.Values, body io.Reader, result interface{}) error {
-	return a.call(http.MethodPost, endpoint, query, body, result)
+func (a *Api) post(endpoint, contentType string, query url.Values, body io.Reader, result interface{}) error {
+	return a.call(http.MethodPost, endpoint, contentType, query, body, result)
 }
 
-func (a *Api) delete(endpoint string, query url.Values, result interface{}) error {
-	return a.call(http.MethodDelete, endpoint, query, nil, result)
+func (a *Api) delete(endpoint, contentType string, query url.Values, result interface{}) error {
+	return a.call(http.MethodDelete, contentType, endpoint, query, nil, result)
 }
 
-func (a *Api) getEvent(endpoint string, query url.Values, result interface{}, sei streamEventInterface) error {
-	res, err := a.callResponse(http.MethodGet, endpoint, query, nil)
+func (a *Api) getEvent(endpoint, contentType string, query url.Values, result interface{}, si streamInterface) error {
+	res, err := a.callResponse(http.MethodGet, endpoint, contentType, query, nil)
 	if err != nil {
 		return err
 	}
 
-	go writeEventData(sei, res, result)
+	go writeEventData(si, res, result)
 
 	return nil
 }
 
-func (a *Api) postEvent(endpoint string, query url.Values, body io.Reader, result interface{}, sei streamEventInterface) error {
-	res, err := a.callResponse(http.MethodPost, endpoint, query, body)
+func (a *Api) postEvent(endpoint, contentType string, query url.Values, body io.Reader, result interface{}, si streamInterface) error {
+	res, err := a.callResponse(http.MethodPost, endpoint, contentType, query, body)
 	if err != nil {
 		return err
 	}
 
-	go writeEventData(sei, res, result)
+	go writeEventData(si, res, result)
 
 	return nil
 }
 
 //formRequest generate a request
-func (a *Api) formRequest(method, endpoint string, query url.Values, body io.Reader) (*http.Request, error) {
+func (a *Api) formRequest(method, endpoint string, contentType string, query url.Values, body io.Reader) (*http.Request, error) {
+	err := checkContentType(contentType)
+	if err != nil {
+		return nil, err
+	}
+
 	u := url.URL{
 		Host:     HOST,
 		Path:     endpoint,
 		RawQuery: query.Encode(),
 		Scheme:   "https",
 	}
+
 	req, err := http.NewRequest(method, u.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", a.token))
+	req.Header.Add("Content-Type", contentType)
+
 	return req, nil
 }
 
 //callGetResponse send a request, return response and don't close connection
-func (a *Api) callResponse(method, endpoint string, query url.Values, body io.Reader) (*http.Response, error) {
-	req, err := a.formRequest(method, endpoint, query, body)
+func (a *Api) callResponse(method, endpoint, contentType string, query url.Values, body io.Reader) (*http.Response, error) {
+	req, err := a.formRequest(method, endpoint, contentType, query, body)
 	if err != nil {
 		return nil, err
 	}
@@ -86,8 +99,8 @@ func (a *Api) callResponse(method, endpoint string, query url.Values, body io.Re
 }
 
 //callDontClose send a request and write the result
-func (a *Api) call(method, endpoint string, query url.Values, body io.Reader, result interface{}) error {
-	req, err := a.formRequest(method, endpoint, query, body)
+func (a *Api) call(method, endpoint, contentType string, query url.Values, body io.Reader, result interface{}) error {
+	req, err := a.formRequest(method, endpoint, contentType, query, body)
 	if err != nil {
 		return err
 	}
@@ -116,19 +129,28 @@ func (a *Api) call(method, endpoint string, query url.Values, body io.Reader, re
 	return nil
 }
 
-func writeEventData(sei streamEventInterface, response *http.Response, result interface{}) {
+func writeEventData(si streamInterface, response *http.Response, result interface{}) {
 	defer response.Body.Close()
+	defer si.Close() // TODO if there is no check for a closed channel in this method, then there will be an error, changex
 
 	for {
-		if sei.isClosed() {
+		if si.isClosed() {
 			break
-		} else if err := json.NewDecoder(response.Body).Decode(result); err == nil {
-			sei.write(result)
+		} else if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+			break
 		} else {
-			sei.Close()
-			break
+			si.write(result)
 		}
 	}
 
 	return
+}
+
+//checkContentType Check available content types
+func checkContentType(contentType string) error {
+	switch contentType {
+	case CONTENT_TYPE_JSON, CONTENT_TYPE_PGN:
+		return nil
+	}
+	return errors.New("Unknown Content-Type ")
 }

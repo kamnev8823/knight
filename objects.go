@@ -497,3 +497,51 @@ type TimeControl struct {
 	Increment int    `json:"increment"`
 	Show      string `json:"show"`
 }
+
+type TV struct {
+	Bot           TVChannel `json:"Bot"`
+	Blitz         TVChannel `json:"Blitz"`
+	RacingKings   TVChannel `json:"Racing Kings"`
+	UltraBullet   TVChannel `json:"UltraBullet"`
+	Bullet        TVChannel `json:"Bullet"`
+	Classical     TVChannel `json:"Classical"`
+	ThreeCheck    TVChannel `json:"Three-check"`
+	Antichess     TVChannel `json:"Antichess"`
+	Computer      TVChannel `json:"Computer"`
+	Horde         TVChannel `json:"Horde"`
+	Atomic        TVChannel `json:"Atomic"`
+	Crazyhouse    TVChannel `json:"Crazyhouse"`
+	Chess960      TVChannel `json:"Chess960"`
+	KingOfTheHill TVChannel `json:"King of the Hill"`
+	TopRated      TVChannel `json:"Top Rated"`
+}
+
+type TVChannel struct {
+	User   TVUser `json:"user"`
+	Rating int    `json:"rating"`
+	GameId string `json:"gameId"`
+}
+
+type TVUser struct {
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+	Title string `json:"title"`
+}
+
+type TVStream struct {
+	T string `json:"t"`
+	D TVD    `json:"d"`
+}
+
+type TVD struct {
+	Id          string      `json:"id"`
+	Orientation string      `json:"orientation"`
+	Players     [2]TVPlayer `json:"players"` // TODO if lichess add chess for three players, then to be an error
+	Fen         string      `json:"fen"`
+}
+
+type TVPlayer struct {
+	Color  string `json:"color"`
+	User   TVUser `json:"user"`
+	Rating int    `json:"rating"`
+}

@@ -1,6 +1,6 @@
 package knight
 
-type streamEventInterface interface {
+type streamInterface interface {
 	Close()
 	isClosed() bool
 	write(interface{}) bool
@@ -35,4 +35,35 @@ func (ec *EventChan) write(c interface{}) bool {
 
 func (ec *EventChan) isClosed() bool {
 	return ec.closed
+}
+
+type TVChan struct {
+	channel chan *TVStream
+	closed  bool
+}
+
+func (tvc *TVChan) GetChan() <-chan *TVStream {
+	return tvc.channel
+}
+
+func (tvc *TVChan) Close() {
+	if !tvc.closed {
+		tvc.closed = true
+		close(tvc.channel)
+	}
+}
+
+func (tvc *TVChan) write(c interface{}) bool {
+	if !tvc.closed {
+		switch c.(type) {
+		case *TVStream:
+			tvc.channel <- c.(*TVStream)
+			return true
+		}
+	}
+	return false
+}
+
+func (tvc *TVChan) isClosed() bool {
+	return tvc.closed
 }

@@ -6,7 +6,7 @@ func (a *Api) StreamIncomingEvents() (*EventChan, error) {
 		closed:  false,
 	}
 	r := new(Event)
-	err := a.getEvent("/api/stream/event", nil, r, ec)
+	err := a.getEvent("/api/stream/event", CONTENT_TYPE_JSON, nil, r, ec)
 	if err != nil {
 		return nil, err
 	}
