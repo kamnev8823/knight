@@ -7,7 +7,7 @@ import (
 
 func (a *Api) GetProfile() (*Account, error) {
 	account := new(Account)
-	err := a.get("/api/account", CONTENT_TYPE_JSON, nil, account)
+	err := a.get("/api/account", nil, account)
 	if err != nil {
 		return nil, err
 	}
@@ -16,7 +16,7 @@ func (a *Api) GetProfile() (*Account, error) {
 
 func (a *Api) GetEmail() (*AccountEmail, error) {
 	email := new(AccountEmail)
-	err := a.get("/api/account/email", CONTENT_TYPE_JSON, nil, email)
+	err := a.get("/api/account/email", nil, email)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (a *Api) GetEmail() (*AccountEmail, error) {
 
 func (a *Api) GetPreference() (*Preferences, error) {
 	preferences := new(Preferences)
-	err := a.get("/api/account/preferences", CONTENT_TYPE_JSON, nil, preferences)
+	err := a.get("/api/account/preferences", nil, preferences)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (a *Api) GetPreference() (*Preferences, error) {
 
 func (a *Api) GetKidMode() (*KidMode, error) {
 	kid := new(KidMode)
-	err := a.get("/api/account/kid", CONTENT_TYPE_JSON, nil, kid)
+	err := a.get("/api/account/kid", nil, kid)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (a *Api) SetKidMode(v bool) (bool, error) {
 	u.Add("v", fmt.Sprintf("%v", v))
 
 	isOk := new(isOk)
-	err := a.post("/api/account/kid", CONTENT_TYPE_JSON, u, nil, isOk)
+	err := a.post("/api/account/kid", u, nil, isOk)
 	if err != nil {
 		return false, err
 	}

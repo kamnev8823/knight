@@ -5,14 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 )
 
 const (
-	HOST              = "lichess.org"
-	CONTENT_TYPE_JSON = "application/json"
-	CONTENT_TYPE_PGN  = "application/x-chess-pgn"
+	HOST          = "lichess.org"
+	ACCEPT_NDJSON = "application/x-ndjson"
+	ACCEPT_PGN    = "application/x-chess-pgn"
 )
 
 type Api struct {
@@ -23,20 +24,30 @@ func NewApi(token string) *Api {
 	return &Api{token}
 }
 
-func (a *Api) get(endpoint, contentType string, query url.Values, result interface{}) error {
-	return a.call(http.MethodGet, endpoint, contentType, query, nil, result)
+func (a *Api) get(endpoint string, query url.Values, result interface{}) error {
+	return a.call(http.MethodGet, endpoint, ACCEPT_NDJSON, query, nil, result)
 }
 
-func (a *Api) post(endpoint, contentType string, query url.Values, body io.Reader, result interface{}) error {
-	return a.call(http.MethodPost, endpoint, contentType, query, body, result)
+func (a *Api) getPgn(endpoint string, query url.Values) ([]byte, error) {
+	res, err := a.callResponse(http.MethodGet, endpoint, ACCEPT_NDJSON, query, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	return ioutil.ReadAll(res.Body)
 }
 
-func (a *Api) delete(endpoint, contentType string, query url.Values, result interface{}) error {
-	return a.call(http.MethodDelete, contentType, endpoint, query, nil, result)
+func (a *Api) post(endpoint string, query url.Values, body io.Reader, result interface{}) error {
+	return a.call(http.MethodPost, endpoint, ACCEPT_NDJSON, query, body, result)
 }
 
-func (a *Api) getEvent(endpoint, contentType string, query url.Values, result interface{}, si streamInterface) error {
-	res, err := a.callResponse(http.MethodGet, endpoint, contentType, query, nil)
+func (a *Api) delete(endpoint string, query url.Values, result interface{}) error {
+	return a.call(http.MethodDelete, ACCEPT_NDJSON, endpoint, query, nil, result)
+}
+
+func (a *Api) getEvent(endpoint string, query url.Values, result interface{}, si streamInterface) error {
+	res, err := a.callResponse(http.MethodGet, endpoint, ACCEPT_NDJSON, query, nil)
 	if err != nil {
 		return err
 	}
@@ -46,8 +57,8 @@ func (a *Api) getEvent(endpoint, contentType string, query url.Values, result in
 	return nil
 }
 
-func (a *Api) postEvent(endpoint, contentType string, query url.Values, body io.Reader, result interface{}, si streamInterface) error {
-	res, err := a.callResponse(http.MethodPost, endpoint, contentType, query, body)
+func (a *Api) postEvent(endpoint string, query url.Values, body io.Reader, result interface{}, si streamInterface) error {
+	res, err := a.callResponse(http.MethodPost, endpoint, ACCEPT_NDJSON, query, body)
 	if err != nil {
 		return err
 	}
@@ -58,12 +69,7 @@ func (a *Api) postEvent(endpoint, contentType string, query url.Values, body io.
 }
 
 //formRequest generate a request
-func (a *Api) formRequest(method, endpoint string, contentType string, query url.Values, body io.Reader) (*http.Request, error) {
-	err := checkContentType(contentType)
-	if err != nil {
-		return nil, err
-	}
-
+func (a *Api) formRequest(method, endpoint string, acceptType string, query url.Values, body io.Reader) (*http.Request, error) {
 	u := url.URL{
 		Host:     HOST,
 		Path:     endpoint,
@@ -77,14 +83,14 @@ func (a *Api) formRequest(method, endpoint string, contentType string, query url
 	}
 
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", a.token))
-	req.Header.Add("Content-Type", contentType)
+	req.Header.Add("Accept", acceptType)
 
 	return req, nil
 }
 
 //callGetResponse send a request, return response and don't close connection
-func (a *Api) callResponse(method, endpoint, contentType string, query url.Values, body io.Reader) (*http.Response, error) {
-	req, err := a.formRequest(method, endpoint, contentType, query, body)
+func (a *Api) callResponse(method, endpoint, acceptType string, query url.Values, body io.Reader) (*http.Response, error) {
+	req, err := a.formRequest(method, endpoint, acceptType, query, body)
 	if err != nil {
 		return nil, err
 	}
@@ -99,8 +105,8 @@ func (a *Api) callResponse(method, endpoint, contentType string, query url.Value
 }
 
 //callDontClose send a request and write the result
-func (a *Api) call(method, endpoint, contentType string, query url.Values, body io.Reader, result interface{}) error {
-	req, err := a.formRequest(method, endpoint, contentType, query, body)
+func (a *Api) call(method, endpoint, acceptType string, query url.Values, body io.Reader, result interface{}) error {
+	req, err := a.formRequest(method, endpoint, acceptType, query, body)
 	if err != nil {
 		return err
 	}
@@ -144,13 +150,4 @@ func writeEventData(si streamInterface, response *http.Response, result interfac
 	}
 
 	return
-}
-
-//checkContentType Check available content types
-func checkContentType(contentType string) error {
-	switch contentType {
-	case CONTENT_TYPE_JSON, CONTENT_TYPE_PGN:
-		return nil
-	}
-	return errors.New("Unknown Content-Type ")
 }

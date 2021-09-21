@@ -13,7 +13,7 @@ func (a *Api) GetUsersStatus(ids ...string) ([]*UserStatus, error) {
 	u := make(url.Values)
 	u.Add("ids", strings.Join(ids, ","))
 
-	err := a.get("api/users/status", CONTENT_TYPE_JSON, u, &usersStatus)
+	err := a.get("api/users/status", u, &usersStatus)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (a *Api) GetUsersStatus(ids ...string) ([]*UserStatus, error) {
 func (a *Api) GetUser(username string) (*Account, error) {
 	account := new(Account)
 
-	err := a.get(fmt.Sprintf("api/user/%v", username), CONTENT_TYPE_JSON, nil, account)
+	err := a.get(fmt.Sprintf("api/user/%v", username), nil, account)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (a *Api) GetUser(username string) (*Account, error) {
 func (a *Api) GetUserHistory(username string) ([]*History, error) {
 	var history []*History
 
-	err := a.get(fmt.Sprintf("api/user/%v/rating-history", username), CONTENT_TYPE_JSON, nil, &history)
+	err := a.get(fmt.Sprintf("api/user/%v/rating-history", username), nil, &history)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (a *Api) GetUserHistory(username string) ([]*History, error) {
 func (a *Api) GetPerformance(username string, perf string) (*Performance, error) {
 	performance := new(Performance)
 
-	err := a.get(fmt.Sprintf("api/user/%v/perf/%v", username, perf), CONTENT_TYPE_JSON, nil, performance)
+	err := a.get(fmt.Sprintf("api/user/%v/perf/%v", username, perf), nil, performance)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (a *Api) GetPerformance(username string, perf string) (*Performance, error)
 func (a *Api) GetUserActivity(username string) ([]*Activity, error) {
 	var activity []*Activity
 
-	err := a.get(fmt.Sprintf("api/user/%v/activity", username), CONTENT_TYPE_JSON, nil, &activity)
+	err := a.get(fmt.Sprintf("api/user/%v/activity", username), nil, &activity)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (a *Api) GetUsersById(ids []string) ([]*User, error) {
 	var users []*User
 
 	body := bytes.NewReader([]byte(strings.Join(ids, ",")))
-	err := a.post("api/users", CONTENT_TYPE_JSON, nil, body, &users)
+	err := a.post("api/users", nil, body, &users)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (a *Api) GetUsersById(ids []string) ([]*User, error) {
 
 func (a *Api) GetMembersTeam(teamId string) (*Account, error) {
 	member := new(Account)
-	err := a.get(fmt.Sprintf("api/team/%v/users", teamId), CONTENT_TYPE_JSON, nil, member)
+	err := a.get(fmt.Sprintf("api/team/%v/users", teamId), nil, member)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (a *Api) GetMembersTeam(teamId string) (*Account, error) {
 func (a *Api) GetLiveStreamer() ([]*Streamer, error) {
 	var streamers []*Streamer
 
-	err := a.get("streamer/live", CONTENT_TYPE_JSON, nil, &streamers)
+	err := a.get("streamer/live", nil, &streamers)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (a *Api) GetCrosstable(user1 string, user2 string, matchup bool) (*Crosstab
 	u := make(url.Values)
 	u.Add("mathcup", fmt.Sprintf("%v", matchup))
 
-	err := a.get(fmt.Sprintf("api/crosstable/%v/%v", user1, user2), CONTENT_TYPE_JSON, u, crosstable)
+	err := a.get(fmt.Sprintf("api/crosstable/%v/%v", user1, user2), u, crosstable)
 	if err != nil {
 		return nil, err
 	}

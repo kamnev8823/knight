@@ -523,9 +523,10 @@ type TVChannel struct {
 }
 
 type TVUser struct {
-	Id    string `json:"id"`
-	Name  string `json:"name"`
-	Title string `json:"title"`
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	Title  string `json:"title"`
+	Patron bool   `json:"patron"`
 }
 
 type TVStream struct {
@@ -544,4 +545,61 @@ type TVPlayer struct {
 	Color  string `json:"color"`
 	User   TVUser `json:"user"`
 	Rating int    `json:"rating"`
+}
+
+type TVBest struct {
+	Id          string    `json:"id"`
+	Rated       bool      `json:"rated"`
+	Variant     string    `json:"variant"`
+	Speed       string    `json:"speed"`
+	Perf        string    `json:"perf"`
+	CreatedAt   int       `json:"createdAt"`
+	LastMoveAt  int       `json:"lastMoveAt"`
+	Status      string    `json:"status"`
+	Players     TVPlayers `json:"players"`
+	InitialFen  string    `json:"initialFen"`
+	Winner      string    `json:"winner"`
+	Opening     Opening   `json:"opening"`
+	Moves       string    `json:"moves"`
+	Clock       Clock     `json:"clock"`
+	Pgn         string    `json:"pgn"`
+	DaysPerTurn string    `json:"daysPerTurn"`
+	Analysis    []Analyze `json:"analysis"`
+	Tournament  string    `json:"tournament"`
+	Swiss       string    `json:"swiss"`
+}
+
+type TVPlayers struct {
+	White TVOpponent `json:"white"`
+	Black TVOpponent `json:"black"`
+}
+
+type TVOpponent struct {
+	User       TVUser `json:"user"`
+	Rating     int    `json:"rating"`
+	RatingDiff int    `json:"ratingDiff"`
+}
+
+type Opening struct {
+	Eco  string `json:"eco"`
+	Name string `json:"name"`
+	Ply  int    `json:"ply"`
+}
+
+type Clock struct {
+	Initial   int `json:"initial"`
+	Increment int `json:"increment"`
+	TotalTime int `json:"totalTime"`
+}
+
+type Analyze struct {
+	Eval      int             `json:"eval"`
+	Best      string          `json:"best"`
+	Variation string          `json:"variation"`
+	Judgment  AnalyzeJudgment `json:"judgment"`
+}
+
+type AnalyzeJudgment struct {
+	Name    string `json:"name"`
+	Comment string `json:"comment"`
 }
