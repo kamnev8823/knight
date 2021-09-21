@@ -603,3 +603,81 @@ type AnalyzeJudgment struct {
 	Name    string `json:"name"`
 	Comment string `json:"comment"`
 }
+
+type DailyPuzzle struct {
+	Game   PuzzleGame `json:"game"`
+	Puzzle Puzzle     `json:"puzzle"`
+}
+
+type PuzzleGame struct {
+	Clock   string          `json:"clock"`
+	Id      string          `json:"id"`
+	Perf    Perf            `json:"perf"`
+	Pgn     string          `json:"pgn"`
+	Players [2]PuzzlePlayer `json:"players"`
+	Rated   bool            `json:"rated"`
+}
+
+type PuzzlePlayer struct {
+	Color  string `json:"color"`
+	Name   string `json:"name"`
+	UserId string `json:"userId"`
+}
+
+type Puzzle struct {
+	Id         string   `json:"id"`
+	InitialPly int      `json:"initialPly"`
+	Plays      int      `json:"plays"`
+	Rating     int      `json:"rating"`
+	Solution   []string `json:"solution"`
+	Themes     []string `json:"themes"`
+}
+
+type PuzzleActivity struct {
+	Id           string `json:"id"`
+	Date         int    `json:"date"`
+	Win          bool   `json:"win"`
+	PuzzleRating int    `json:"puzzleRating"`
+}
+
+type PuzzleDashboard struct {
+	Days   int                             `json:"days"`
+	Global PuzzleResults                   `json:"global"`
+	Themes map[string]PuzzleDashboardTheme `json:"themes"`
+}
+
+type PuzzleResults struct {
+	FirstWins       int `json:"firstWins"`
+	Nb              int `json:"nb"`
+	Performance     int `json:"performance"`
+	PuzzleRatingAvg int `json:"puzzleRatingAvg"`
+	ReplayWins      int `json:"replayWins"`
+}
+
+type PuzzleDashboardTheme struct {
+	Theme   string        `json:"theme"`
+	Results PuzzleResults `json:"results"`
+}
+
+type StormDashboard struct {
+	High StormHigh  `json:"high"`
+	Days []StormDay `json:"days"`
+}
+
+type StormHigh struct {
+	AllTime int `json:"allTime"`
+	Day     int `json:"day"`
+	Mont    int `json:"mont"`
+	Week    int `json:"week"`
+}
+
+type StormDay struct {
+	Id      string `json:"_id"`
+	Combo   int    `json:"combo"`
+	Errors  int    `json:"errors"`
+	Highest int    `json:"highest"`
+	Moves   int    `json:"moves"`
+	Runs    int    `json:"runs"`
+	Score   int    `json:"score"`
+	Time    int    `json:"time"`
+}
