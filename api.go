@@ -28,8 +28,9 @@ func (a *Api) get(endpoint string, query url.Values, result interface{}) error {
 	return a.call(http.MethodGet, endpoint, ACCEPT_NDJSON, query, nil, result)
 }
 
+// TODO find the best for getting pgn value
 func (a *Api) getPgn(endpoint string, query url.Values) ([]byte, error) {
-	res, err := a.callResponse(http.MethodGet, endpoint, ACCEPT_NDJSON, query, nil)
+	res, err := a.callResponse(http.MethodGet, endpoint, ACCEPT_PGN, query, nil)
 	if err != nil {
 		return nil, err
 	}

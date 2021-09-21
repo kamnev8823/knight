@@ -18,7 +18,7 @@ func (a *Api) GetPuzzleActivity() (*PuzzleActivity, error) {
 	puzzle := new(PuzzleActivity)
 
 	u := make(url.Values)
-	u.Add("max", "1") // TODO need to change, because i dont get objects array in response
+	u.Add("max", "1") // TODO need to change (find the best way), because i dont get objects array in response
 
 	err := a.get("api/puzzle/activity", u, puzzle)
 	if err != nil {

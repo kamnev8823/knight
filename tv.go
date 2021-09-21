@@ -3,6 +3,7 @@ package knight
 import (
 	"fmt"
 	"net/url"
+	"strconv"
 )
 
 func (a *Api) GetCurrentTVGames() (*TV, error) {
@@ -31,7 +32,7 @@ func (a *Api) GetBestTVOngoingGames(channel string, moves, pgnInJson, tags, cloc
 	best := new(TVBest)
 
 	u := make(url.Values)
-	u.Add("nb", "1") // TODO need to change, because i dont get objects array in response
+	u.Add("nb", "1") // TODO need to change (find the best way), because i dont get objects array in response
 	u.Add("tags", fmt.Sprintf("%v", tags))
 	u.Add("moves", fmt.Sprintf("%v", moves))
 	u.Add("clocks", fmt.Sprintf("%v", clocks))
@@ -43,4 +44,16 @@ func (a *Api) GetBestTVOngoingGames(channel string, moves, pgnInJson, tags, cloc
 		return nil, err
 	}
 	return best, err
+}
+
+func (a *Api) GetBestTVOngoingGamesPGN(channel string, nb int, moves, pgnInJson, tags, clocks, opening bool) ([]byte, error) {
+	u := make(url.Values)
+	u.Add("nb", strconv.Itoa(nb))
+	u.Add("tags", fmt.Sprintf("%v", tags))
+	u.Add("moves", fmt.Sprintf("%v", moves))
+	u.Add("clocks", fmt.Sprintf("%v", clocks))
+	u.Add("opening", fmt.Sprintf("%v", opening))
+	u.Add("pgnInJson", fmt.Sprintf("%v", pgnInJson))
+
+	return a.getPgn(fmt.Sprintf("api/tv/%v", channel), u)
 }
