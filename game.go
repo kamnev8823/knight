@@ -6,23 +6,31 @@ import (
 	"strconv"
 )
 
-type ExportGame struct {
-	Json *Game
-	Pgn  []byte
+type exportGame struct {
+	json *Game
+	pgn  []byte
 }
 
-func (a *Api) ExportGame(gameId string, moves, pgnInJson, tags, clocks, opening, isPgn bool) (*ExportGame, error) {
+func (a *Api) ExportGame(gameId string, moves, pgnInJson, tags, clocks, opening, isPgn bool) (*Game, error) {
 	route := fmt.Sprintf("game/export/%v", gameId)
-	return a.exportJsonOrPgn(route, moves, pgnInJson, tags, clocks, opening, isPgn)
+	eg, err := a.exportJsonOrPgn(route, moves, pgnInJson, tags, clocks, opening, isPgn)
+	if err != nil {
+		return nil, err
+	}
+	return eg.json, nil
 }
 
-func (a *Api) ExportOngoingGame(username string, moves, pgnInJson, tags, clocks, opening, isPgn bool) (*ExportGame, error) {
+func (a *Api) ExportOngoingGame(username string, moves, pgnInJson, tags, clocks, opening, isPgn bool) ([]byte, error) {
 	route := fmt.Sprintf("api/user/%v/current-game", username)
-	return a.exportJsonOrPgn(route, moves, pgnInJson, tags, clocks, opening, isPgn)
+	eg, err := a.exportJsonOrPgn(route, moves, pgnInJson, tags, clocks, opening, isPgn)
+	if err != nil {
+		return nil, err
+	}
+	return eg.pgn, nil
 }
 
-func (a *Api) exportJsonOrPgn(route string, moves, pgnInJson, tags, clocks, opening, isPgn bool) (*ExportGame, error) {
-	game := &ExportGame{
+func (a *Api) exportJsonOrPgn(route string, moves, pgnInJson, tags, clocks, opening, isPgn bool) (*exportGame, error) {
+	game := &exportGame{
 		new(Game),
 		[]byte{},
 	}
@@ -39,9 +47,9 @@ func (a *Api) exportJsonOrPgn(route string, moves, pgnInJson, tags, clocks, open
 		if err != nil {
 			return nil, err
 		}
-		game.Pgn = l
+		game.pgn = l
 
-	} else if err := a.get(route, AcceptJson, nil, game.Json); err != nil {
+	} else if err := a.get(route, AcceptJson, nil, game.json); err != nil {
 		return nil, err
 	}
 
