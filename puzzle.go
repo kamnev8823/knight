@@ -7,7 +7,7 @@ import (
 
 func (a *Api) GetDailyPuzzle() (*DailyPuzzle, error) {
 	puzzle := new(DailyPuzzle)
-	err := a.get("api/puzzle/daily", nil, puzzle)
+	err := a.get("api/puzzle/daily", AcceptNdjson, nil, puzzle)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func (a *Api) GetPuzzleActivity() (*PuzzleActivity, error) {
 	u := make(url.Values)
 	u.Add("max", "1") // TODO need to change (find the best way), because i dont get objects array in response
 
-	err := a.get("api/puzzle/activity", u, puzzle)
+	err := a.get("api/puzzle/activity", AcceptNdjson, u, puzzle)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (a *Api) GetPuzzleActivity() (*PuzzleActivity, error) {
 func (a *Api) GetPuzzleDashboard(days int) (*PuzzleDashboard, error) {
 	puzzle := new(PuzzleDashboard)
 
-	err := a.get(fmt.Sprintf("api/puzzle/dashboard/%v", days), nil, puzzle)
+	err := a.get(fmt.Sprintf("api/puzzle/dashboard/%v", days), AcceptJson, nil, puzzle)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (a *Api) GetPuzzleDashboard(days int) (*PuzzleDashboard, error) {
 func (a *Api) GetStormDashboard(username string) (*StormDashboard, error) {
 	puzzle := new(StormDashboard)
 
-	err := a.get(fmt.Sprintf("api/storm/dashboard/%v", username), nil, puzzle)
+	err := a.get(fmt.Sprintf("api/storm/dashboard/%v", username), AcceptJson, nil, puzzle)
 	if err != nil {
 		return nil, err
 	}

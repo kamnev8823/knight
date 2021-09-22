@@ -8,7 +8,7 @@ import (
 
 func (a *Api) GetCurrentTVGames() (*TV, error) {
 	tv := new(TV)
-	err := a.get("api/tv/channels", nil, tv)
+	err := a.get("api/tv/channels", AcceptJson, nil, tv)
 	if err != nil {
 		return nil, err
 	}
@@ -28,8 +28,8 @@ func (a *Api) StreamCurrentTVGame() (*TVChan, error) {
 	return tvc, nil
 }
 
-func (a *Api) GetBestTVOngoingGames(channel string, moves, pgnInJson, tags, clocks, opening bool) (*TVBest, error) {
-	best := new(TVBest)
+func (a *Api) GetBestTVOngoingGames(channel string, moves, pgnInJson, tags, clocks, opening bool) (*Game, error) {
+	best := new(Game)
 
 	u := make(url.Values)
 	u.Add("nb", "1") // TODO need to change (find the best way), because i dont get objects array in response
@@ -39,7 +39,7 @@ func (a *Api) GetBestTVOngoingGames(channel string, moves, pgnInJson, tags, cloc
 	u.Add("opening", fmt.Sprintf("%v", opening))
 	u.Add("pgnInJson", fmt.Sprintf("%v", pgnInJson))
 
-	err := a.get(fmt.Sprintf("api/tv/%v", channel), u, best)
+	err := a.get(fmt.Sprintf("api/tv/%v", channel), AcceptNdjson, u, best)
 	if err != nil {
 		return nil, err
 	}
@@ -55,5 +55,5 @@ func (a *Api) GetBestTVOngoingGamesPGN(channel string, nb int, moves, pgnInJson,
 	u.Add("opening", fmt.Sprintf("%v", opening))
 	u.Add("pgnInJson", fmt.Sprintf("%v", pgnInJson))
 
-	return a.getPgn(fmt.Sprintf("api/tv/%v", channel), u)
+	return a.getPlain(fmt.Sprintf("api/tv/%v", channel), AcceptPgn, u)
 }

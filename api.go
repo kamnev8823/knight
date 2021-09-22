@@ -10,10 +10,14 @@ import (
 	"net/url"
 )
 
+const HOST = "lichess.org"
+
 const (
-	HOST          = "lichess.org"
-	ACCEPT_NDJSON = "application/x-ndjson"
-	ACCEPT_PGN    = "application/x-chess-pgn"
+	AcceptJson    = "application/json"
+	AcceptVndJson = "application/vnd.lichess.v3+json"
+	AcceptNdjson  = "application/x-ndjson"
+	AcceptPgn     = "application/x-chess-pgn"
+	AcceptText    = "text/plain"
 )
 
 type Api struct {
@@ -24,13 +28,13 @@ func NewApi(token string) *Api {
 	return &Api{token}
 }
 
-func (a *Api) get(endpoint string, query url.Values, result interface{}) error {
-	return a.call(http.MethodGet, endpoint, ACCEPT_NDJSON, query, nil, result)
+func (a *Api) get(endpoint, accept string, query url.Values, result interface{}) error {
+	return a.call(http.MethodGet, endpoint, accept, query, nil, result)
 }
 
-// TODO find the best for getting pgn value
-func (a *Api) getPgn(endpoint string, query url.Values) ([]byte, error) {
-	res, err := a.callResponse(http.MethodGet, endpoint, ACCEPT_PGN, query, nil)
+// TODO find the best for getting pgn or plaintext value
+func (a *Api) getPlain(endpoint, accept string, query url.Values) ([]byte, error) {
+	res, err := a.callResponse(http.MethodGet, endpoint, accept, query, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -39,16 +43,16 @@ func (a *Api) getPgn(endpoint string, query url.Values) ([]byte, error) {
 	return ioutil.ReadAll(res.Body)
 }
 
-func (a *Api) post(endpoint string, query url.Values, body io.Reader, result interface{}) error {
-	return a.call(http.MethodPost, endpoint, ACCEPT_NDJSON, query, body, result)
+func (a *Api) post(endpoint, accept string, query url.Values, body io.Reader, result interface{}) error {
+	return a.call(http.MethodPost, endpoint, accept, query, body, result)
 }
 
-func (a *Api) delete(endpoint string, query url.Values, result interface{}) error {
-	return a.call(http.MethodDelete, ACCEPT_NDJSON, endpoint, query, nil, result)
+func (a *Api) delete(endpoint, accept string, query url.Values, result interface{}) error {
+	return a.call(http.MethodDelete, endpoint, accept, query, nil, result)
 }
 
 func (a *Api) getEvent(endpoint string, query url.Values, result interface{}, si streamInterface) error {
-	res, err := a.callResponse(http.MethodGet, endpoint, ACCEPT_NDJSON, query, nil)
+	res, err := a.callResponse(http.MethodGet, endpoint, AcceptNdjson, query, nil)
 	if err != nil {
 		return err
 	}
@@ -59,7 +63,7 @@ func (a *Api) getEvent(endpoint string, query url.Values, result interface{}, si
 }
 
 func (a *Api) postEvent(endpoint string, query url.Values, body io.Reader, result interface{}, si streamInterface) error {
-	res, err := a.callResponse(http.MethodPost, endpoint, ACCEPT_NDJSON, query, body)
+	res, err := a.callResponse(http.MethodPost, endpoint, AcceptNdjson, query, body)
 	if err != nil {
 		return err
 	}

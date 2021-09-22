@@ -266,6 +266,39 @@ type PlayStreak struct {
 	LastDate time.Time `json:"lastDate"`
 }
 
+type TopPlayers struct {
+	Bullet        []UserShortInfo `json:"bullet"`
+	Blitz         []UserShortInfo `json:"blitz"`
+	Rapid         []UserShortInfo `json:"rapid"`
+	Classical     []UserShortInfo `json:"classical"`
+	UltraBullet   []UserShortInfo `json:"ultraBullet"`
+	Chess960      []UserShortInfo `json:"chess960"`
+	Crazyhouse    []UserShortInfo `json:"crazyhouse"`
+	Antichess     []UserShortInfo `json:"antichess"`
+	Atomic        []UserShortInfo `json:"atomic"`
+	Horde         []UserShortInfo `json:"horde"`
+	KingOfTheHill []UserShortInfo `json:"kingOfTheHill"`
+	RacingKings   []UserShortInfo `json:"racingKings"`
+	ThreeCheck    []UserShortInfo `json:"threeCheck"`
+}
+
+type UserShortInfo struct {
+	Id       string                    `json:"id"`
+	Username string                    `json:"username"`
+	Perfs    map[string]PerfsShortStat `json:"perfs"`
+	Online   bool                      `json:"online"`
+	Title    string                    `json:"title"`
+}
+
+type PerfsShortStat struct {
+	Rating   int `json:"rating"`
+	Progress int `json:"progress"`
+}
+
+type Leaderboard struct {
+	Users []UserShortInfo `json:"users"`
+}
+
 type Activity struct {
 	Interval            Interval                    `json:"interval"`
 	Games               GamesActivity               `json:"games"`
@@ -433,7 +466,7 @@ type CrosstableMatchup struct {
 
 type Event struct {
 	Type      string    `json:"type"`
-	Game      Game      `json:"game"`
+	Game      EventGame `json:"game"`
 	Challenge Challenge `json:"challenge"`
 }
 
@@ -455,7 +488,7 @@ type Perf struct {
 	Name string `json:"name"`
 }
 
-type Game struct {
+type EventGame struct {
 	Id     string `json:"id"`
 	Compat Compat `json:"compat"`
 }
@@ -547,7 +580,7 @@ type TVPlayer struct {
 	Rating int    `json:"rating"`
 }
 
-type TVBest struct {
+type Game struct {
 	Id          string    `json:"id"`
 	Rated       bool      `json:"rated"`
 	Variant     string    `json:"variant"`
