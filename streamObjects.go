@@ -11,7 +11,7 @@ type EventChan struct {
 	closed  bool
 }
 
-func (ec *EventChan) GetChan() <-chan *Event {
+func (ec *EventChan) Stream() <-chan *Event {
 	return ec.channel
 }
 
@@ -42,7 +42,7 @@ type TVChan struct {
 	closed  bool
 }
 
-func (tvc *TVChan) GetChan() <-chan *TVStream {
+func (tvc *TVChan) Stream() <-chan *TVStream {
 	return tvc.channel
 }
 
