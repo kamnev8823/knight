@@ -142,12 +142,10 @@ func (a *Api) call(method, endpoint, acceptType string, query url.Values, body i
 
 func writeEventData(si streamInterface, response *http.Response, result interface{}) {
 	defer response.Body.Close()
-	defer si.Close() // TODO if there is no check for a closed channel in this method, then there will be an error, changex
+	defer si.close() // TODO if there is no check for a closed channel in this method, then there will be an error, changex
 
 	for {
-		if si.isClosed() {
-			break
-		} else if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		if err := json.NewDecoder(response.Body).Decode(result); err != nil {
 			break
 		} else {
 			si.write(result)

@@ -15,17 +15,16 @@ func (a *Api) GetCurrentTVGames() (*TV, error) {
 	return tv, nil
 }
 
-func (a *Api) StreamCurrentTVGame() (*TVChan, error) {
+func (a *Api) StreamCurrentTVGame() (<-chan *TVStream, error) {
 	tvc := &TVChan{
 		channel: make(chan *TVStream),
-		closed:  false,
 	}
 	v := new(TVStream)
 	err := a.getEvent("api/tv/feed", nil, v, tvc)
 	if err != nil {
 		return nil, err
 	}
-	return tvc, nil
+	return tvc.channel, nil
 }
 
 func (a *Api) GetBestTVOngoingGames(channel string, moves, pgnInJson, tags, clocks, opening bool) (*Game, error) {
