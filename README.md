@@ -6,12 +6,12 @@
 ```go
     api := knight.NewApi("your_token")
     
-    event, err := api.StreamIncomingEvents()
+    eventStream, err := api.StreamIncomingEvents()
     if err != nil {
         // do something
     }
     
-    for ev := range event.Stream() {
+    for ev := range eventStream {
         if ev.Type == "gameStart" {
             // do something
         }       
