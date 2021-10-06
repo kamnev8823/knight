@@ -6,23 +6,49 @@ import (
 	"strconv"
 )
 
-type ExportGame struct {
+type exportGame struct {
 	Json *Game
 	Pgn  []byte
 }
 
-func (a *Api) ExportGame(gameId string, moves, pgnInJson, tags, clocks, opening, isPgn bool) (*ExportGame, error) {
+func (a *Api) ExportGameJson(gameId string, moves, pgnInJson, tags, clocks, opening bool) (*Game, error) {
 	route := fmt.Sprintf("game/export/%v", gameId)
-	return a.exportJsonOrPgn(route, moves, pgnInJson, tags, clocks, opening, isPgn)
+	r, err := a.exportJsonOrPgn(route, moves, pgnInJson, tags, clocks, opening, false)
+	if err != nil {
+		return nil, err
+	}
+	return r.Json, nil
 }
 
-func (a *Api) ExportOngoingGame(username string, moves, pgnInJson, tags, clocks, opening, isPgn bool) (*ExportGame, error) {
+func (a *Api) ExportGamePgn(gameId string, moves, pgnInJson, tags, clocks, opening bool) ([]byte, error) {
+	route := fmt.Sprintf("game/export/%v", gameId)
+	r, err := a.exportJsonOrPgn(route, moves, pgnInJson, tags, clocks, opening, true)
+	if err != nil {
+		return nil, err
+	}
+	return r.Pgn, nil
+}
+
+func (a *Api) ExportOngoingGameJson(username string, moves, pgnInJson, tags, clocks, opening bool) (*Game, error) {
 	route := fmt.Sprintf("api/user/%v/current-game", username)
-	return a.exportJsonOrPgn(route, moves, pgnInJson, tags, clocks, opening, isPgn)
+	r, err := a.exportJsonOrPgn(route, moves, pgnInJson, tags, clocks, opening, false)
+	if err != nil {
+		return nil, err
+	}
+	return r.Json, nil
 }
 
-func (a *Api) exportJsonOrPgn(route string, moves, pgnInJson, tags, clocks, opening, isPgn bool) (*ExportGame, error) {
-	game := &ExportGame{
+func (a *Api) ExportOngoingGamePgn(username string, moves, pgnInJson, tags, clocks, opening bool) ([]byte, error) {
+	route := fmt.Sprintf("api/user/%v/current-game", username)
+	r, err := a.exportJsonOrPgn(route, moves, pgnInJson, tags, clocks, opening, true)
+	if err != nil {
+		return nil, err
+	}
+	return r.Pgn, nil
+}
+
+func (a *Api) exportJsonOrPgn(route string, moves, pgnInJson, tags, clocks, opening, isPgn bool) (*exportGame, error) {
+	game := &exportGame{
 		new(Game),
 		[]byte{},
 	}
