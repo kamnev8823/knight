@@ -10,7 +10,7 @@ import (
 	"net/url"
 )
 
-const HOST = "lichess.org"
+const Host = "lichess.org"
 
 const (
 	AcceptJson    = "application/json"
@@ -76,7 +76,7 @@ func (a *Api) postEvent(endpoint string, query url.Values, body io.Reader, resul
 //formRequest generate a request
 func (a *Api) formRequest(method, endpoint string, acceptType string, query url.Values, body io.Reader) (*http.Request, error) {
 	u := url.URL{
-		Host:     HOST,
+		Host:     Host,
 		Path:     endpoint,
 		RawQuery: query.Encode(),
 		Scheme:   "https",
@@ -142,7 +142,7 @@ func (a *Api) call(method, endpoint, acceptType string, query url.Values, body i
 
 func writeEventData(si streamInterface, response *http.Response, result interface{}) {
 	defer response.Body.Close()
-	defer si.close() // TODO if there is no check for a closed channel in this method, then there will be an error, changex
+	defer si.close()
 
 	for {
 		if err := json.NewDecoder(response.Body).Decode(result); err != nil {

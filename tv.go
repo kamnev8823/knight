@@ -18,6 +18,7 @@ func (a *Api) GetCurrentTVGames() (*TV, error) {
 func (a *Api) StreamCurrentTVGame() (<-chan *TVStream, error) {
 	tvc := &TVChan{
 		channel: make(chan *TVStream),
+		signal:  make(chan bool, 1),
 	}
 	v := new(TVStream)
 	err := a.getEvent("api/tv/feed", nil, v, tvc)
