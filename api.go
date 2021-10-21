@@ -147,8 +147,8 @@ func writeEventData(si streamInterface, response *http.Response, result interfac
 	for {
 		if err := json.NewDecoder(response.Body).Decode(result); err != nil {
 			break
-		} else {
-			si.write(result)
+		} else if ok := si.write(result); !ok {
+			break
 		}
 	}
 
