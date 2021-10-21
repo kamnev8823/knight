@@ -6,7 +6,7 @@
 ```go
     api := knight.NewApi("your_token")
     
-    eventStream, err := api.StreamIncomingEvents()
+    eventStream, err := api.StreamIncomingEvents() // get <-chan *Event
     if err != nil {
         // do something
     }
@@ -16,4 +16,71 @@
             // do something
         }       
     }
+
+```
+or 
+```go
+    api := knight.NewApi("your_token")
+
+    tvStream, err := a.StreamCurrentTVGame() // get <-chan *TVStream
+    if err != nil {
+        fmt.Println(err)
+    }
+    
+    for game := range tvStream { 
+        // stream current tv game
+    }
+```
+
+###API is available:
+
+```go
+    // account api
+    api.GetProfile
+    api.GetEmail
+    api.GetPreference
+    api.GetKidMode
+    api.SetKidMode
+
+   // users api 	
+    api.GetUsersStatus
+    api.GetUser
+    api.GetUserHistory
+    api.GetPerformance
+    api.GetUserActivity
+    api.GetUsersById
+    api.GetMembersTeam
+    api.GetLiveStreamer
+    api.GetTop10
+    api.GetOneLeadBoard
+
+
+    //relations api
+    api.GetFollowing
+    api.GetFollowers
+    api.FollowPlayer
+    api.UnfollowPlayer
+
+    // game api
+    api.ExportGameJson
+    api.ExportGamePgn
+    api.ExportOngoingGameJson
+    api.ExportOngoingGamePgn
+
+    // puzzle api
+    api.GetDailyPuzzle
+    api.GetPuzzleActivity
+    api.GetPuzzleDashboard
+    api.GetStormDashboard
+
+
+    // tv api
+    api.GetCurrentTVGames
+    api.StreamCurrentTVGame
+    api.GetBestTVOngoingGames
+    api.GetBestTVOngoingGamesPGN
+
+    // board api
+    api.StreamIncomingEvents
+
 ```
